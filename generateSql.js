@@ -19,6 +19,12 @@ const insertSql = (content, tableName) => {
     return query;
 }
 
+const deleteSql = (content, tableName) => {
+    const id  = "\'" + content + "\'"; 
+    const query = `DELETE FROM ${tableName} WHERE id = ${id};`; // for string values '' is necessary
+    return query;
+}
+
 const createSql = (tableName) => {
     const query = `
                 CREATE TABLE IF NOT EXISTS ${tableName}(
@@ -60,7 +66,7 @@ const createSql = (tableName) => {
     return query;
 }
 
-export {insertSql, createSql}
+export {insertSql, createSql, deleteSql};
 
 // INSERT INTO PROMETHEUS_METADATA_MAPPING(
 //     id, unique_name, type, prefix, tenant_id, is_root_type, is_folder, folder_name, device_mapping_enabled, device_mapping_precedence, p_entity_metric_names, p_entity_metric_labels, p_entity_display_name_metric_labels, p_parent_entity_metric_labels, p_entity_agent_id_labels, p_device_metric_names, p_device_metric_labels, agent_type, graph_by_default, kpi, supported_metrics, version, revision,release, parent_id)
