@@ -19,7 +19,7 @@ app.use(express.json());
         const query = createSql("PROMETHEUS_METADATA_MAPPING");
         await pool.query(query);
 
-        app.listen(3000, () => {
+        app.listen(5000, () => {
             console.log("Server listening on port 3000");
         });
     } catch (error) {
