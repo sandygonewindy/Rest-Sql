@@ -1,6 +1,6 @@
 import 'dotenv/config'
 import express from "express";
-import { insertSql, createSql } from "./generateSql.js";
+import { insertSql, createSql, deleteSql } from "./generateSql.js";
 import { pool } from "./db.js";
 import cors from "cors";
  
@@ -18,8 +18,9 @@ app.use(express.json());
     try {
         const query = createSql("PROMETHEUS_METADATA_MAPPING");
         await pool.query(query);
-        app.listen(5000, () => {
-            console.log("Server started on port 5000");
+
+        app.listen(3000, () => {
+            console.log("Server listening on port 3000");
         });
     } catch (error) {
         console.log(error);
@@ -32,7 +33,7 @@ app.get("/", async (req, res) => {
     try {
         const query = `SELECT * FROM PROMETHEUS_METADATA_MAPPING;`
         const result = await pool.query(query);
-        res.status(200).send(result);
+        res.status(200).send(result["rows"]);
     } catch (error) {
         res.status(404).send(error);
         console.log(error);
@@ -45,10 +46,25 @@ app.post("/insert", async (req, res) => {
     try {
         console.log("Entered try");
         const query = insertSql(req.body, "PROMETHEUS_METADATA_MAPPING");
-        await pool.query(query);
-        res.status(200).send("Data Inserted");
+        const result = await pool.query(query);
+        console.log(result);
+        res.status(200).send(`Inserted ${result.rowCount} row(s) successfully`);
     } catch (error) {
         console.log("Entered catch");
+        console.log(error);
+        res.status(404).send(error);
+    }
+});
+
+
+app.delete("/delete", async (req, res) => {
+    try {
+        const query = deleteSql(req.body.id, "PROMETHEUS_METADATA_MAPPING");
+        console.log(query);
+        const result = await pool.query(query);
+        res.status(200).send(`Deleted ${result.rowCount} row(s) successfully`);
+        console.log(result.rowCount);
+    } catch (error) {
         console.log(error);
         res.status(404).send(error);
     }
