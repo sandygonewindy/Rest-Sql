@@ -12,15 +12,17 @@ const app = express();
 
 app.use(cors());
 app.use(express.json());
-
+const TABLE = "PROMETHEUS_METADATA_MAPPING";
+let COLUMNS;
 
 ( async () => {
     try {
-        const query = createSql("PROMETHEUS_METADATA_MAPPING");
+        const query = createSql(TABLE);
         await pool.query(query);
-
+        const fields = await pool.query(`SELECT * FROM ${TABLE};`);
+        COLUMNS = fields['fields'].map(ele => ele.name);
         app.listen(5000, () => {
-            console.log("Server listening on port 3000");
+            console.log("Server listening on port 5000");
         });
     } catch (error) {
         console.log(error);
@@ -31,7 +33,7 @@ app.use(express.json());
 
 app.get("/", async (req, res) => {
     try {
-        const query = `SELECT * FROM PROMETHEUS_METADATA_MAPPING;`
+        const query = `SELECT * FROM ${TABLE};`
         const result = await pool.query(query);
         res.status(200).send(result["rows"]);
     } catch (error) {
@@ -41,25 +43,26 @@ app.get("/", async (req, res) => {
 });
 
 app.post("/insert", async (req, res) => {
-    console.log("Insert api called");
     console.log(req.body);
     try {
-        console.log("Entered try");
-        const query = insertSql(req.body, "PROMETHEUS_METADATA_MAPPING");
+        if(req.body.is_folder && (req.body.folder_name === null || req.body.folder_name === "" || req.body.folder_name === undefined)){
+            res.status(404).send(`Cannot Insert, Value at ${COLUMNS.indexOf('is_folder')} index is empty`);
+            return;
+        }
+        const query = insertSql(req.body, TABLE);
         const result = await pool.query(query);
         console.log(result);
         res.status(200).send(`Inserted ${result.rowCount} row(s) successfully`);
     } catch (error) {
-        console.log("Entered catch");
         console.log(error);
-        res.status(404).send(error);
+        res.status(404).send(error.message);
     }
 });
 
 
 app.delete("/delete", async (req, res) => {
     try {
-        const query = deleteSql(req.body.id, "PROMETHEUS_METADATA_MAPPING");
+        const query = deleteSql(req.body.id, TABLE);
         console.log(query);
         const result = await pool.query(query);
         res.status(200).send(`Deleted ${result.rowCount} row(s) successfully`);
@@ -69,3 +72,6 @@ app.delete("/delete", async (req, res) => {
         res.status(404).send(error);
     }
 });
+
+        // const table_name = "\'" + TABLE + "\'";
+        // const query = `SELECT column_name FROM INFORMATION_SCHEMA.COLUMNS WHERE table_name = ${table_name};`;
