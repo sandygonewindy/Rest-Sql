@@ -2,7 +2,7 @@ import 'dotenv/config'
 import express from "express";
 import { insertSql, createSql, deleteSql } from "./generateSql.js";
 import { pool } from "./db.js";
-import cors from "cors";
+// import cors from "cors";
  
 // INSERT INTO PROMETHEUS_METADATA_MAPPING(
 //     id, unique_name, type, prefix, tenant_id, is_root_type, is_folder, folder_name, device_mapping_enabled, device_mapping_precedence, p_entity_metric_names, p_entity_metric_labels, p_entity_display_name_metric_labels, p_parent_entity_metric_labels, p_entity_agent_id_labels, p_device_metric_names, p_device_metric_labels, agent_type, graph_by_default, kpi, supported_metrics, version, revision,release, parent_id)
@@ -10,7 +10,7 @@ import cors from "cors";
 const app = express();
 // var cors = require('cors')
 
-app.use(cors());
+// app.use(cors());
 app.use(express.json());
 const TABLE = "PROMETHEUS_METADATA_MAPPING";
 let COLUMNS;
@@ -46,7 +46,7 @@ app.post("/insert", async (req, res) => {
     console.log(req.body);
     try {
         if(req.body.is_folder && (req.body.folder_name === null || req.body.folder_name === "" || req.body.folder_name === undefined)){
-            res.status(404).send(`Cannot Insert, Value at ${COLUMNS.indexOf('is_folder')} index is empty`);
+            res.status(404).send(`Cannot Insert, folder name is empty`);
             return;
         }
         const query = insertSql(req.body, TABLE);
@@ -55,7 +55,7 @@ app.post("/insert", async (req, res) => {
         res.status(200).send(`Inserted ${result.rowCount} row(s) successfully`);
     } catch (error) {
         console.log(error);
-        res.status(404).send(error.message);
+        res.status(404).send(`Cannot Insert, ${error.column} is empty`);
     }
 });
 
@@ -65,11 +65,15 @@ app.delete("/delete", async (req, res) => {
         const query = deleteSql(req.body.id, TABLE);
         console.log(query);
         const result = await pool.query(query);
+        if(result.rowCount === 0){
+            res.status(404).send("Could not delete, No Matching field found");
+            return
+        }
         res.status(200).send(`Deleted ${result.rowCount} row(s) successfully`);
         console.log(result.rowCount);
     } catch (error) {
         console.log(error);
-        res.status(404).send(error);
+        res.status(404).send(error.message);
     }
 });
 
