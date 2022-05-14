@@ -26,6 +26,43 @@ const deleteSql = (content, tableName) => {
 }
 
 const createSql = (tableName) => {
+    const query2 = `
+                CREATE TABLE IF NOT EXISTS ${tableName}(
+                    id VARCHAR(255) PRIMARY KEY NOT NULL,
+                    unique_name VARCHAR(255) NOT NULL,
+                    type VARCHAR(255) NOT NULL,
+                    prefix VARCHAR(255) NOT NULL,
+                    tenant_id INT8 NOT NULL,
+                    is_root_type BOOL NOT NULL,
+                    is_folder BOOL NOT NULL,
+                    folder_name VARCHAR(255),
+                    device_mapping_enabled BOOL NOT NULL,
+                    multi_device_mapping_enabled BOOL,
+                    device_mapping_precedence INT,
+                    p_entity_metric_names VARCHAR(255),
+                    p_entity_metric_labels VARCHAR(255),
+                    p_ignore_metric_for_labels VARCHAR(255),
+                    p_entity_display_name_metric_labels VARCHAR(255),
+                    p_entity_display_label_value VARCHAR(255),
+                    p_parent_entity_metric_names VARCHAR(255),
+                    p_parent_entity_metric_labels VARCHAR(255),
+                    p_entity_agent_id_labels VARCHAR(255),
+                    lookup_agent_id_from_parent VARCHAR(255),
+                    p_device_metric_names VARCHAR(255),
+                    p_device_metric_labels VARCHAR(255),
+                    agent_type VARCHAR(255) NOT NULL,
+                    graph_by_default VARCHAR(255),
+                    kpi VARCHAR(255),
+                    supported_metrics VARCHAR(255),
+                    version VARCHAR(255),
+                    revision VARCHAR(255),
+                    release VARCHAR(255),
+                    parent_id VARCHAR(255),
+                    p_entity_agent_id_labels_secondary VARCHAR(255),
+                    p_device_metric_labels_secondary VARCHAR(255),
+                    exclude_label_list_for_entity VARCHAR(255)
+                );
+            `
     const query = `
                 CREATE TABLE IF NOT EXISTS ${tableName}(
                     id VARCHAR(255) PRIMARY KEY,
@@ -63,7 +100,7 @@ const createSql = (tableName) => {
                     exclude_label_list_for_entity VARCHAR(255)
                 );
             `
-    return query;
+    return query2;
 }
 
 export {insertSql, createSql, deleteSql};
