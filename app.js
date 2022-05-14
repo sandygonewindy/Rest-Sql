@@ -20,7 +20,7 @@ app.use(express.json());
         await pool.query(query);
 
         app.listen(5000, () => {
-            console.log("Server listening on port 3000");
+            console.log("Server listening on port 5000");
         });
     } catch (error) {
         console.log(error);
@@ -40,15 +40,36 @@ app.get("/", async (req, res) => {
     }
 });
 
+// app.get("/:id", async (req, res) => {
+//     try {
+//         const query = `SELECT * FROM PROMETHEUS_METADATA_MAPPING WHERE id=$1`
+//         const values = [req.params.id]
+//     } catch (error) {
+//         res.status(404).send(error);
+//         console.log(error);
+//     }
+// })
+
 app.post("/insert", async (req, res) => {
     console.log("Insert api called");
     console.log(req.body);
     try {
         console.log("Entered try");
-        const query = insertSql(req.body, "PROMETHEUS_METADATA_MAPPING");
-        const result = await pool.query(query);
-        console.log(result);
-        res.status(200).send(`Inserted ${result.rowCount} row(s) successfully`);
+        const query1 = insertSql(req.body, "PROMETHEUS_METADATA_MAPPING");
+        const insertResult = await pool.query(query1);
+        const query2 = `SELECT * FROM PROMETHEUS_METADATA_MAPPING WHERE id=$1`
+        const values = [req.body.id]
+        const selectResult = await pool.query(query2, values);
+        // console.log(result1);
+        // console.log(result2);
+
+        const result = {
+            "insertResult": insertResult.rowCount,
+            "selectResult": selectResult.rows[0]
+        }
+        
+        res.status(200).send(result)
+        // res.status(200).send(`Inserted ${result1.rowCount} row(s) successfully`);
     } catch (error) {
         console.log("Entered catch");
         console.log(error);
