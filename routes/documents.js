@@ -1,5 +1,5 @@
 import express from "express";
-import { insertSql, createSql, deleteSql } from "../generateSql.js";
+import { insertSql, createSql, deleteSql, updateSql } from "../generateSql.js";
 import { pool } from "../db.js";
 
 const router = express.Router();
@@ -20,6 +20,21 @@ router.get('/', async (req, res) => {
     }
 });
 
+
+// @route   GET api/documents/
+// @desc    Get a document
+
+router.get("/:id", async (req, res) => {
+    try {
+        const id = "\'" + req.params.id + "\'";
+        const query = `SELECT * FROM ${TABLE} WHERE id = ${id};`
+        const result = await pool.query(query);
+        res.status(200).send(result["rows"]);
+    } catch (error) {
+        res.status(404).send(error);
+        console.log(error);
+    }
+});
 
 // @route   POST /api/documents/insert
 // @desc    Insert a document
@@ -43,6 +58,22 @@ router.post('/insert', async (req, res) => {
     }
 });
 
+
+
+// @route   POST /api/documents/update
+// @desc    Update a document 
+
+router.put('/update/:id', async (req, res) => {
+    try {
+        const query = updateSql(req.body, TABLE, req.params.id);
+        const result = await pool.query(query);
+        console.log(result);
+        res.status(200).send(result);
+    } catch (error) {
+        res.status(404).send(`Cannot Update, ${error.column} is empty`);
+        console.log(error);
+    }
+});
 
 
 // @route   POST /api/documents/delete

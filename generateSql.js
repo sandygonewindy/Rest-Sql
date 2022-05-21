@@ -25,6 +25,30 @@ const deleteSql = (content, tableName) => {
     return query;
 }
 
+const updateSql = (content, tableName, id) => {
+    const columns = Object.keys(content).map((ele) => {
+        return ("\"" + ele + "\"");
+    });
+    let values = Object.values(content).map((ele) => {
+        if(ele === null){
+            return "NULL"
+        }else{
+            if(typeof ele === "string"){
+                // double quotes are interpreted as identifiers
+                return ("\'" + ele + "\'");
+            }
+            else{
+                return ele;    
+            }
+        }
+    });
+    id = "\'" + id + "\'"; 
+    const query = `UPDATE ${tableName} SET (${columns}) = (${values})
+                   WHERE id = ${id};
+                  `
+    return query;
+}
+
 const createSql = (tableName) => {
     const query2 = `
                 CREATE TABLE IF NOT EXISTS ${tableName}(
@@ -103,7 +127,7 @@ const createSql = (tableName) => {
     return query2;
 }
 
-export {insertSql, createSql, deleteSql};
+export {insertSql, createSql, deleteSql, updateSql};
 
 // INSERT INTO PROMETHEUS_METADATA_MAPPING(
 //     id, unique_name, type, prefix, tenant_id, is_root_type, is_folder, folder_name, device_mapping_enabled, device_mapping_precedence, p_entity_metric_names, p_entity_metric_labels, p_entity_display_name_metric_labels, p_parent_entity_metric_labels, p_entity_agent_id_labels, p_device_metric_names, p_device_metric_labels, agent_type, graph_by_default, kpi, supported_metrics, version, revision,release, parent_id)

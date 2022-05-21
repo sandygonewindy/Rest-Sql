@@ -2,7 +2,7 @@ import 'dotenv/config'
 import express from "express";
 import { createSql } from "./generateSql.js";
 import { pool } from "./db.js";
-import cors from "cors";
+// import cors from "cors";
 import documentRouter from './routes/documents.js';
  
 // INSERT INTO PROMETHEUS_METADATA_MAPPING(
@@ -11,7 +11,7 @@ import documentRouter from './routes/documents.js';
 const app = express();
 // var cors = require('cors')
 
-app.use(cors());
+// app.use(cors());
 app.use(express.json());
 const TABLE = "PROMETHEUS_METADATA_MAPPING";
 let COLUMNS;
