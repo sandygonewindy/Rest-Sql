@@ -1,37 +1,36 @@
-import 'dotenv/config'
+import "dotenv/config";
 import express from "express";
 import { createSql } from "./generateSql.js";
 import { pool } from "./db.js";
-// import cors from "cors";
-import documentRouter from './routes/documents.js';
- 
+import cors from "cors";
+import documentRouter from "./routes/documents.js";
+
 // INSERT INTO PROMETHEUS_METADATA_MAPPING(
 //     id, unique_name, type, prefix, tenant_id, is_root_type, is_folder, folder_name, device_mapping_enabled, device_mapping_precedence, p_entity_metric_names, p_entity_metric_labels, p_entity_display_name_metric_labels, p_parent_entity_metric_labels, p_entity_agent_id_labels, p_device_metric_names, p_device_metric_labels, agent_type, graph_by_default, kpi, supported_metrics, version, revision,release, parent_id)
 //     VALUES ('node_node','node_node', 'Node', 'node', '${tenantId}',true, true, 'Node', true, 0, 'node_uname_info', null, null, null, 'instance', 'node_uname_info', 'nodename','Exporter', null, null, 'node_uname_info', '20.08', '20.08.00', '00', null);
 const app = express();
 // var cors = require('cors')
 
-// app.use(cors());
+app.use(cors());
 app.use(express.json());
 const TABLE = "PROMETHEUS_METADATA_MAPPING";
 let COLUMNS;
 
-( async () => {
-    try {
-        const query = createSql(TABLE);
-        await pool.query(query);
-        const fields = await pool.query(`SELECT * FROM ${TABLE};`);
-        COLUMNS = fields['fields'].map(ele => ele.name);
-        app.listen(5000, () => {
-            console.log("Server listening on port 5000");
-        });
-    } catch (error) {
-        console.log(error);
-    }
-}) ()
+(async () => {
+  try {
+    const query = createSql(TABLE);
+    await pool.query(query);
+    const fields = await pool.query(`SELECT * FROM ${TABLE};`);
+    COLUMNS = fields["fields"].map((ele) => ele.name);
+    app.listen(5000, () => {
+      console.log("Server listening on port 5000");
+    });
+  } catch (error) {
+    console.log(error);
+  }
+})();
 
-app.use('/api/documents', documentRouter);
-
+app.use("/api/documents", documentRouter);
 
 // app.get("/", async (req, res) => {
 //     try {
@@ -71,7 +70,6 @@ app.use('/api/documents', documentRouter);
 //     }
 // });
 
-
 // app.delete("/delete", async (req, res) => {
 //     try {
 //         const query = deleteSql(req.body.id, TABLE);
@@ -89,5 +87,5 @@ app.use('/api/documents', documentRouter);
 //     }
 // });
 
-        // const table_name = "\'" + TABLE + "\'";
-        // const query = `SELECT column_name FROM INFORMATION_SCHEMA.COLUMNS WHERE table_name = ${table_name};`;
+// const table_name = "\'" + TABLE + "\'";
+// const query = `SELECT column_name FROM INFORMATION_SCHEMA.COLUMNS WHERE table_name = ${table_name};`;
